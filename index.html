@@ -1,75 +1,526 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Le Ptit Bistro 🍷</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-        .card {
-            background: rgba(255,255,255,0.05);
-            backdrop-filter: blur(20px);
-            border-radius: 24px;
-            padding: 40px 32px;
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-            border: 1px solid rgba(255,255,255,0.1);
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
-        }
-        .avatar {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            margin: 0 auto 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 48px;
-        }
-        h1 { color: #fff; font-size: 24px; margin-bottom: 4px; }
-        .subtitle { color: rgba(255,255,255,0.6); font-size: 14px; margin-bottom: 28px; }
-        .link {
-            display: block;
-            padding: 16px 20px;
-            margin-bottom: 12px;
-            background: rgba(255,255,255,0.08);
-            border: 1px solid rgba(255,255,255,0.12);
-            border-radius: 14px;
-            color: #fff;
-            text-decoration: none;
-            font-size: 16px;
-            font-weight: 500;
-            transition: all 0.2s;
-        }
-        .link:hover { background: rgba(255,255,255,0.15); transform: translateY(-2px); }
-        .link.discord { background: #5865F2; border-color: #5865F2; }
-        .link.discord:hover { background: #4752c4; }
-        .link-icon { margin-right: 10px; }
-        .footer { color: rgba(255,255,255,0.3); font-size: 12px; margin-top: 24px; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Le Ptit Bistro — Clash Royale</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #0a0a0f;
+      color: #fff;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── Canvas animé ── */
+    #particles-canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* ── Ambiance overlay ── */
+    .ambient-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 1;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 0%, rgba(180, 120, 40, 0.08) 0%, transparent 70%),
+        radial-gradient(ellipse 60% 50% at 20% 80%, rgba(120, 60, 20, 0.06) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 40% at 80% 70%, rgba(200, 160, 60, 0.05) 0%, transparent 60%);
+    }
+
+    /* ── Vignette ── */
+    .vignette {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 2;
+      pointer-events: none;
+      background: radial-gradient(ellipse 70% 60% at 50% 50%, transparent 50%, rgba(0,0,0,0.6) 100%);
+    }
+
+    /* ── Contenu ── */
+    .container {
+      position: relative;
+      z-index: 3;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 20px;
+    }
+
+    /* ── Carte principale ── */
+    .card {
+      position: relative;
+      width: 100%;
+      max-width: 440px;
+      padding: 48px 32px 40px;
+      background: linear-gradient(
+        145deg,
+        rgba(255, 255, 255, 0.06) 0%,
+        rgba(255, 255, 255, 0.02) 100%
+      );
+      backdrop-filter: blur(24px) saturate(1.2);
+      -webkit-backdrop-filter: blur(24px) saturate(1.2);
+      border-radius: 28px;
+      border: 1px solid rgba(255, 215, 140, 0.12);
+      box-shadow:
+        0 4px 60px rgba(180, 120, 40, 0.08),
+        inset 0 1px 0 rgba(255, 215, 140, 0.06);
+      text-align: center;
+    }
+
+    /* ── Bordure lueur ── */
+    .card::before {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: 28px;
+      padding: 1px;
+      background: linear-gradient(
+        135deg,
+        rgba(255, 215, 140, 0.2),
+        rgba(255, 255, 255, 0.05) 40%,
+        rgba(255, 215, 140, 0.08) 60%,
+        rgba(255, 215, 140, 0.15)
+      );
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+
+    /* ── Décoration couronne ── */
+    .crown {
+      position: absolute;
+      top: -32px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 72px;
+      height: 72px;
+      background: linear-gradient(135deg, #1a1a2e 0%, #2a1a0e 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      border: 2px solid rgba(255, 215, 140, 0.2);
+      box-shadow: 0 4px 30px rgba(180, 120, 40, 0.2);
+    }
+
+    /* ── Logo / Avatar ── */
+    .avatar {
+      width: 88px;
+      height: 88px;
+      border-radius: 50%;
+      margin: 0 auto 20px;
+      background: linear-gradient(135deg, #c9952e 0%, #e8b84a 40%, #f5d06e 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      box-shadow:
+        0 0 40px rgba(200, 150, 40, 0.25),
+        inset 0 2px 0 rgba(255,255,255,0.3);
+      position: relative;
+    }
+    .avatar::after {
+      content: '';
+      position: absolute;
+      inset: -3px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(255,215,140,0.3), transparent 60%);
+      z-index: -1;
+    }
+
+    /* ── Typo ── */
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #f5d06e 0%, #e8b84a 40%, #c9952e 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.2;
+      margin-bottom: 4px;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      font-weight: 400;
+      color: rgba(255, 215, 140, 0.5);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+
+    .subtitle span {
+      display: inline-block;
+      animation: pulseText 3s ease-in-out infinite;
+    }
+
+    @keyframes pulseText {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; }
+    }
+
+    .divider {
+      width: 60px;
+      height: 2px;
+      margin: 20px auto;
+      background: linear-gradient(90deg, transparent, rgba(255, 215, 140, 0.3), transparent);
+      border-radius: 2px;
+    }
+
+    .tagline {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.5);
+      font-weight: 300;
+      line-height: 1.6;
+      margin-bottom: 28px;
+    }
+    .tagline em {
+      font-style: normal;
+      color: rgba(255, 215, 140, 0.7);
+    }
+
+    /* ── Liens ── */
+    .links { display: flex; flex-direction: column; gap: 12px; }
+
+    .link {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 20px;
+      border-radius: 14px;
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: 500;
+      color: #fff;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.04);
+    }
+    .link:hover {
+      transform: translateY(-3px) scale(1.01);
+      border-color: rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.08);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+    }
+    .link:active {
+      transform: translateY(-1px) scale(1.005);
+    }
+
+    .link .icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+      transition: all 0.3s;
+    }
+    .link:hover .icon { transform: scale(1.05); }
+
+    .link .label {
+      flex: 1;
+      text-align: left;
+    }
+    .link .label small {
+      display: block;
+      font-size: 11px;
+      font-weight: 400;
+      color: rgba(255,255,255,0.35);
+      margin-top: 2px;
+    }
+    .link .arrow {
+      font-size: 16px;
+      color: rgba(255,255,255,0.25);
+      transition: all 0.3s;
+    }
+    .link:hover .arrow {
+      color: rgba(255,215,140,0.6);
+      transform: translateX(4px);
+    }
+
+    /* Discord */
+    .link.discord { border-color: rgba(88, 101, 242, 0.25); background: rgba(88, 101, 242, 0.08); }
+    .link.discord .icon { background: rgba(88, 101, 242, 0.2); color: #8ea1e1; }
+    .link.discord:hover { border-color: rgba(88, 101, 242, 0.5); background: rgba(88, 101, 242, 0.15); box-shadow: 0 8px 30px rgba(88, 101, 242, 0.15); }
+
+    /* Boutique */
+    .link.shop { border-color: rgba(255, 185, 60, 0.2); background: rgba(255, 185, 60, 0.06); }
+    .link.shop .icon { background: rgba(255, 185, 60, 0.15); color: #f5d06e; }
+    .link.shop:hover { border-color: rgba(255, 185, 60, 0.4); background: rgba(255, 185, 60, 0.1); box-shadow: 0 8px 30px rgba(255, 185, 60, 0.1); }
+
+    /* Stats */
+    .link.stats { border-color: rgba(255, 255, 255, 0.06); background: rgba(255, 255, 255, 0.02); }
+    .link.stats .icon { background: rgba(255, 255, 255, 0.06); color: rgba(255,255,255,0.5); }
+    .link.stats:hover { border-color: rgba(255, 255, 255, 0.12); background: rgba(255, 255, 255, 0.05); }
+
+    /* ── Badge en ligne ── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: 100px;
+      font-size: 11px;
+      font-weight: 500;
+      color: rgba(255, 215, 140, 0.7);
+      background: rgba(255, 215, 140, 0.06);
+      border: 1px solid rgba(255, 215, 140, 0.08);
+      margin-bottom: 20px;
+    }
+    .badge .dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #4ade80;
+      display: inline-block;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 0.4; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.3); }
+    }
+
+    /* ── Footer ── */
+    .footer {
+      margin-top: 32px;
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.15);
+      letter-spacing: 1px;
+      font-weight: 300;
+    }
+    .footer .hearts { color: rgba(255, 100, 100, 0.3); }
+
+    /* ── Animations ── */
+    .card > * {
+      opacity: 0;
+      animation: fadeUp 0.6s ease-out forwards;
+    }
+    .avatar              { animation-delay: 0.05s; }
+    .badge               { animation-delay: 0.15s; }
+    h1                   { animation-delay: 0.2s; }
+    .subtitle            { animation-delay: 0.25s; }
+    .divider             { animation-delay: 0.3s; }
+    .tagline             { animation-delay: 0.35s; }
+    .links               { animation-delay: 0.4s; }
+    .footer              { animation-delay: 0.55s; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 480px) {
+      .card { padding: 40px 24px 32px; border-radius: 20px; }
+      h1 { font-size: 26px; }
+      .avatar { width: 72px; height: 72px; font-size: 32px; }
+      .crown { width: 60px; height: 60px; font-size: 26px; top: -28px; }
+    }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,215,140,0.15); border-radius: 4px; }
+  </style>
 </head>
 <body>
+
+  <canvas id="particles-canvas"></canvas>
+  <div class="ambient-overlay"></div>
+  <div class="vignette"></div>
+
+  <div class="container">
     <div class="card">
-        <div class="avatar">🍷</div>
-        <h1>Le Ptit Bistro</h1>
-        <p class="subtitle">Notre clan sur Clash Royale</p>
-        
-        <a href="https://discord.com/invite/f8pMqdCAM5" target="_blank" class="link discord">
-            <span class="link-icon">💬</span> Rejoindre notre Discord
+      <div class="crown">👑</div>
+      <div class="avatar">🍷</div>
+      <div class="badge"><span class="dot"></span> 24 membres en ligne</div>
+      <h1>Le Ptit Bistro</h1>
+      <p class="subtitle"><span>✦</span> Clan Clash Royale <span>✦</span></p>
+      <div class="divider"></div>
+      <p class="tagline">
+        Ambiance taverne &amp; compétition.<br>
+        On partage un verre, on monte ensemble.<br>
+        <em>#PL2F4LQJ</em>
+      </p>
+
+      <div class="links">
+        <a href="https://discord.com/invite/f8pMqdCAM5" target="_blank" rel="noopener" class="link discord">
+          <span class="icon">💬</span>
+          <span class="label">
+            Discord
+            <small>Rejoindre la communauté</small>
+          </span>
+          <span class="arrow">→</span>
         </a>
-        
-        <div class="footer">⚔️ Le Ptit Bistro — Clash Royale</div>
+        <a href="#" class="link shop">
+          <span class="icon">⚔️</span>
+          <span class="label">
+            Rejoindre le clan
+            <small>Clash Royale — Tag: #PL2F4LQJ</small>
+          </span>
+          <span class="arrow">→</span>
+        </a>
+        <a href="#" class="link stats">
+          <span class="icon">📊</span>
+          <span class="label">
+            Statistiques
+            <small>Trophées &amp; guerre de clan</small>
+          </span>
+          <span class="arrow">→</span>
+        </a>
+      </div>
     </div>
+    <p class="footer">🍷 <span class="hearts">♡</span> Le Ptit Bistro <span class="hearts">♡</span> 🍷</p>
+  </div>
+
+  <script>
+    (function() {
+      const canvas = document.getElementById('particles-canvas');
+      const ctx = canvas.getContext('2d');
+      let W, H;
+
+      function resize() {
+        W = canvas.width  = window.innerWidth;
+        H = canvas.height = window.innerHeight;
+      }
+      window.addEventListener('resize', resize);
+      resize();
+
+      // ── Particles ──
+      const count = Math.min(80, Math.floor(W * H / 12000));
+      const particles = [];
+      for (let i = 0; i < count; i++) {
+        particles.push({
+          x:      Math.random() * W,
+          y:      Math.random() * H,
+          vx:     (Math.random() - 0.5) * 0.15,
+          vy:     -(Math.random() * 0.1 + 0.02),
+          r:      Math.random() * 2 + 0.6,
+          alpha:  Math.random() * 0.35 + 0.08,
+          drift:  Math.random() * 0.3 - 0.15,
+        });
+      }
+
+      // ── Links between nearby particles ──
+      const maxDist = 120;
+
+      // ── Sparkles ──
+      const sparkles = [];
+      function addSparkle() {
+        sparkles.push({
+          x: Math.random() * W,
+          y: Math.random() * H,
+          r: Math.random() * 1.5 + 0.5,
+          alpha: 0.6 + Math.random() * 0.4,
+          life: 0,
+          maxLife: 60 + Math.random() * 40,
+          vx: (Math.random() - 0.5) * 0.3,
+          vy: -(Math.random() * 0.2 + 0.05),
+        });
+      }
+      for (let i = 0; i < 6; i++) setTimeout(() => addSparkle(), i * 200);
+
+      function draw() {
+        ctx.clearRect(0, 0, W, H);
+
+        // ── Draw connections first ──
+        for (let i = 0; i < particles.length; i++) {
+          for (let j = i + 1; j < particles.length; j++) {
+            const dx = particles[i].x - particles[j].x;
+            const dy = particles[i].y - particles[j].y;
+            const dist = Math.sqrt(dx*dx + dy*dy);
+            if (dist < maxDist) {
+              const alpha = (1 - dist / maxDist) * 0.06;
+              ctx.beginPath();
+              ctx.moveTo(particles[i].x, particles[i].y);
+              ctx.lineTo(particles[j].x, particles[j].y);
+              ctx.strokeStyle = `rgba(200, 170, 110, ${alpha})`;
+              ctx.lineWidth = 0.6;
+              ctx.stroke();
+            }
+          }
+        }
+
+        // ── Draw particles ──
+        for (const p of particles) {
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(230, 200, 150, ${p.alpha})`;
+          ctx.fill();
+        }
+
+        // ── Draw sparkles ──
+        for (let i = sparkles.length - 1; i >= 0; i--) {
+          const s = sparkles[i];
+          s.x += s.vx;
+          s.y += s.vy;
+          s.life++;
+          const progress = s.life / s.maxLife;
+          const alpha = s.alpha * (1 - progress);
+
+          if (s.life >= s.maxLife) { sparkles.splice(i, 1); continue; }
+
+          // Glow
+          const grad = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.r * 3);
+          grad.addColorStop(0, `rgba(255, 215, 140, ${alpha * 0.4})`);
+          grad.addColorStop(1, `rgba(255, 215, 140, 0)`);
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, s.r * 3, 0, Math.PI * 2);
+          ctx.fillStyle = grad;
+          ctx.fill();
+
+          // Core
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(255, 215, 140, ${alpha})`;
+          ctx.fill();
+        }
+
+        // ── Update particles ──
+        for (const p of particles) {
+          p.x += p.vx + p.drift * 0.02;
+          p.y += p.vy;
+          if (p.y < -10) {
+            p.y = H + 10;
+            p.x = Math.random() * W;
+            p.vx = (Math.random() - 0.5) * 0.15;
+            p.vy = -(Math.random() * 0.1 + 0.02);
+          }
+          if (p.x < -20) p.x = W + 20;
+          if (p.x > W + 20) p.x = -20;
+        }
+
+        // ── Spawn sparkles periodically ──
+        if (Math.random() < 0.02 && sparkles.length < 15) addSparkle();
+
+        requestAnimationFrame(draw);
+      }
+
+      draw();
+    })();
+  </script>
+
 </body>
 </html>
