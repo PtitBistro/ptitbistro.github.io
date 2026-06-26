@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Le Ptit Bistro 🍷</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .card {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 40px 32px;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+        }
+        .avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0 auto 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+        }
+        h1 { color: #fff; font-size: 24px; margin-bottom: 4px; }
+        .subtitle { color: rgba(255,255,255,0.6); font-size: 14px; margin-bottom: 28px; }
+        .link {
+            display: block;
+            padding: 16px 20px;
+            margin-bottom: 12px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 14px;
+            color: #fff;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .link:hover { background: rgba(255,255,255,0.15); transform: translateY(-2px); }
+        .link.discord { background: #5865F2; border-color: #5865F2; }
+        .link.discord:hover { background: #4752c4; }
+        .link-icon { margin-right: 10px; }
+        .footer { color: rgba(255,255,255,0.3); font-size: 12px; margin-top: 24px; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="avatar">🍷</div>
+        <h1>Le Ptit Bistro</h1>
+        <p class="subtitle">Notre clan sur Clash Royale</p>
+        
+        <a href="https://discord.com/invite/f8pMqdCAM5" target="_blank" class="link discord">
+            <span class="link-icon">💬</span> Rejoindre notre Discord
+        </a>
+        
+        <div class="footer">⚔️ Le Ptit Bistro — Clash Royale</div>
+    </div>
+</body>
+</html>
